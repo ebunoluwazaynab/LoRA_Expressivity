@@ -1,0 +1,2 @@
+epoch,loss,accuracy,runtime,samples_per_second,steps_per_second
+1.0,0.9152312278747559,0.4946000366099213,4.4738,1221.099,19.223
