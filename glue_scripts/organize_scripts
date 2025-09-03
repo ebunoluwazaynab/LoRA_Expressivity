@@ -10,79 +10,91 @@ def organize_experiments(base_path):
         return
 
     # Create a new, organized directory
-    os.makedirs("results", exist_ok=True)
-    print(f"Created main organized directory: results")
+    os.makedirs("glue_results", exist_ok=True)
+    print(f"Created main organized directory: glue_results")
 
     # Regex to extract rank and alpha value from LoRA folder names
     lora_pattern = re.compile(r"lora_r(\d+)_alpha(\d+)_lr")
     rslora_pattern = re.compile(r"rslora_r(\d+)_alpha(\d+)_lr")
 
-    # Iterate through each task folder
-    for task_folder in os.listdir(base_path):
-        task_path = os.path.join(base_path, task_folder)
+    # Iterate through each task
+    for task in os.listdir(base_path):
+        task_path = os.path.join(base_path, task)
         if not os.path.isdir(task_path):
             continue
 
-        new_task_path = os.path.join("results", task_folder)
+        new_task_path = os.path.join("glue_results", task)
         os.makedirs(new_task_path, exist_ok=True)
-        print(f"\nProcessing task: {task_folder}")
+        print(f"\nProcessing task: {task}")
 
-        # Iterate through the run folders inside the task folder
-        for run_folder in os.listdir(task_path):
-            run_path = os.path.join(task_path, run_folder)
-            if not os.path.isdir(run_path):
+        # Iterate through each model type within the task
+        for model_type in os.listdir(task_path):
+            model_type_path = os.path.join(task_path, model_type)
+            if not os.path.isdir(model_type_path):
                 continue
 
-            dest_folder_name = None
-            if run_folder.startswith("full_finetuning"):
-                dest_folder_name = "full_finetuning"
-            elif run_folder.startswith("lora"):
-                match = lora_pattern.search(run_folder)
-                if match:
-                    rank = int(match.group(1))
-                    alpha = int(match.group(2))
-                    if alpha == rank:
-                        dest_folder_name = "lora_alpha_R"
-                    elif alpha == 2 * rank:
-                        dest_folder_name = "lora_alpha_2R"
-                    else:
-                        print(f"  -> Skipped '{run_folder}' (Alpha value does not match R or 2R)")
-                        continue
-                else:
-                    print(f"  -> Skipped '{run_folder}' (LoRA folder name pattern not recognized)")
+            new_model_type_path = os.path.join(new_task_path, model_type)
+            os.makedirs(new_model_type_path, exist_ok=True)
+            print(f"  Processing model type: {model_type}")
+
+            # Iterate through the run folders inside the model type folder
+            for run_folder in os.listdir(model_type_path):
+                run_path = os.path.join(model_type_path, run_folder)
+                if not os.path.isdir(run_path):
                     continue
-            elif run_folder.startswith("rslora"):
-                match = rslora_pattern.search(run_folder)
-                if match:
-                    rank = int(match.group(1))
-                    alpha = int(match.group(2))
-                    if alpha == rank:
-                        dest_folder_name = "rslora_alpha_R"
-                    elif alpha == 2 * rank:
-                        dest_folder_name = "rslora_alpha_2R"
+
+                dest_folder_name = None
+                if run_folder.startswith("full_finetuning"):
+                    dest_folder_name = "full_finetuning"
+                elif run_folder.startswith("lora"):
+                    match = lora_pattern.search(run_folder)
+                    if match:
+                        rank = int(match.group(1))
+                        alpha = int(match.group(2))
+                        if alpha == rank:
+                            dest_folder_name = "lora_alpha_R"
+                        elif alpha == 2 * rank:
+                            dest_folder_name = "lora_alpha_2R"
+                        else:
+                            print(f"    -> Skipped '{run_folder}' (Alpha value does not match R or 2R)")
+                            continue
                     else:
-                        print(f"  -> Skipped '{run_folder}' (Alpha value does not match R or 2R)")
+                        print(f"    -> Skipped '{run_folder}' (LoRA folder name pattern not recognized)")
                         continue
-                else:
-                    print(f"  -> Skipped '{run_folder}' (RsLoRA folder name pattern not recognized)")
-                    continue
-            
-            # If a category is found, copy the folder
-            if dest_folder_name:
-                dest_path = os.path.join(new_task_path, dest_folder_name, run_folder)
+                elif run_folder.startswith("rslora"):
+                    match = rslora_pattern.search(run_folder)
+                    if match:
+                        rank = int(match.group(1))
+                        alpha = int(match.group(2))
+                        if alpha == rank:
+                            dest_folder_name = "rslora_alpha_R"
+                        elif alpha == 2 * rank:
+                            dest_folder_name = "rslora_alpha_2R"
+                        else:
+                            print(f"    -> Skipped '{run_folder}' (Alpha value does not match R or 2R)")
+                            continue
+                    else:
+                        print(f"    -> Skipped '{run_folder}' (RsLoRA folder name pattern not recognized)")
+                        continue
                 
-                try:
-                    # Check if the destination path already exists to prevent errors
-                    if not os.path.exists(dest_path):
-                        shutil.copytree(run_path, dest_path)
-                        print(f"  -> Copied '{run_folder}' to '{dest_folder_name}'")
-                    else:
-                        print(f"  -> Skipped '{run_folder}' (Destination already exists)")
-                except shutil.Error as e:
-                    print(f"  -> Could not copy '{run_folder}': {e}")
-            else:
-                print(f"  -> Skipped '{run_folder}' (No matching category)")
+                # If a category is found, copy the folder
+                if dest_folder_name:
+                    method_path = os.path.join(new_model_type_path, dest_folder_name)
+                    os.makedirs(method_path, exist_ok=True)
+                    dest_path = os.path.join(method_path, run_folder)
+                    
+                    try:
+                        # Check if the destination path already exists to prevent errors
+                        if not os.path.exists(dest_path):
+                            shutil.copytree(run_path, dest_path)
+                            print(f"    -> Copied '{run_folder}' to '{task}/{model_type}/{dest_folder_name}'")
+                        else:
+                            print(f"    -> Skipped '{run_folder}' (Destination already exists)")
+                    except shutil.Error as e:
+                        print(f"    -> Could not copy '{run_folder}': {e}")
+                else:
+                    print(f"    -> Skipped '{run_folder}' (No matching category)")
 
 if __name__ == "__main__":
-    roberta_base_directory = "experiments/roberta-base"
-    organize_experiments(roberta_base_directory)
+    base_directory = "rte"  # Change this to your base directory containing task folders
+    organize_experiments(base_directory)

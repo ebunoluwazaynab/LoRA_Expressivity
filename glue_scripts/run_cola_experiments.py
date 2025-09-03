@@ -317,7 +317,7 @@ config = {
     "learning_rates": np.logspace(np.log10(1e-4), np.log10(1e-2), 5),
     "lora_ranks": [1, 4, 8, 16, 32, 64, 128, 256, 512, 768], # List for rank sweep
     "alpha_multiplier": 1,
-    "methods": ["lora", "rslora"],
+    "methods": ["rslora"],
     "epochs": 5,
     "batch_size": 32,
     "logging_strategy": "epoch", 
