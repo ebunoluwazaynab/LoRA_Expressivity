@@ -317,7 +317,7 @@ config = {
     "learning_rates": [1.00000000e-05, 1.77827941e-05, 3.16227766e-05, 5.62341325e-05],
     "lora_ranks": [64, 128, 256, 512, 1024], # List for rank sweep
     "alpha_multiplier": 1,
-    "methods": ["lora", "rslora"],
+    "methods": ["rslora"],
     "epochs": 5,
     "batch_size": 32,
     "logging_strategy": "epoch", 
