@@ -315,7 +315,7 @@ config = {
     "tasks": ["sst2"],
     "models": ["roberta-large"],
     "learning_rates": [1.00000000e-05, 1.77827941e-05, 3.16227766e-05, 5.62341325e-05],
-    "lora_ranks": [64, 128, 256, 512, 768], # List for rank sweep
+    "lora_ranks": [1024], # List for rank sweep
     "alpha_multiplier": 1,
     "methods": ["lora", "rslora"],
     "epochs": 5,
