@@ -314,16 +314,15 @@ model_config = {
 config = {
     "tasks": ["mnli"],
     "models": ["roberta-base"],
-    "learning_rates": np.logspace(np.log10(1e-4), np.log10(1e-2), 5),
-    "lora_ranks": [16, 32, 64, 128, 256, 512, 768], # List for rank sweep
+    "learning_rates": np.logspace(np.log10(1e-5), np.log10(1e-4), 5),
+    "lora_ranks": [1, 4, 8, 16, 32], # List for rank sweep
     "alpha_multiplier": 1,
-    "methods": ["lora", "rslora"],
+    "methods": ["full_finetuning"],
     "epochs": 5,
     "batch_size": 32,
     "logging_strategy": "epoch", 
     "logging_steps": 100, 
 }
-
 def get_output_dir(task, model_name, method, lora_r=None, lora_alpha=None, lr=None):
     base_dir = f"mnli/{model_name}"
     if method == "full_finetuning":

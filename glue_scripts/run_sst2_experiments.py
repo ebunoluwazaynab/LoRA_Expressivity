@@ -314,10 +314,10 @@ model_config = {
 config = {
     "tasks": ["sst2"],
     "models": ["roberta-base"],
-    "learning_rates": [0.0001, 0.00031623, 0.001, 0.00316228, 0.01, 1.00000000e-05, 1.77827941e-05, 3.16227766e-05, 5.62341325e-05],
+    "learning_rates": np.logspace(np.log10(1e-5), np.log10(1e-4), 5),
     "lora_ranks": [1, 4, 8, 16, 32], # List for rank sweep
     "alpha_multiplier": 1,
-    "methods": ["rslora"],
+    "methods": ["full_finetuning"],
     "epochs": 5,
     "batch_size": 32,
     "logging_strategy": "epoch", 
